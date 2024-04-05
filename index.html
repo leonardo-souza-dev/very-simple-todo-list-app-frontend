@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Home</title>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Todo List</h2>
+    </div>
+    <div class="content">
+      <input type="text" id="task-message" placeholder="Enter task">
+      <button onclick="addTask()">Add Task</button>
+
+      <div id="results-section">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function addTask() {
+      var taskMessage = document.getElementById('task-message').value;
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://very-simple-todo-list-app-backend.vercel.app/tasks', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          getResults();
+        }
+      };
+      xhr.send(JSON.stringify({ message: taskMessage }));
+    }
+
+    function getResults() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://very-simple-todo-list-app-backend.vercel.app/tasks', true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var results = JSON.parse(xhr.responseText);
+          var resultsSection = document.getElementById('results-section');
+          resultsSection.innerHTML = '';
+          results.forEach(function(result) {
+            var resultDiv = document.createElement('div');
+            resultDiv.innerHTML = result.message + ' - ' + (result.done === 1 ? "Done✅" : "Open❌");
+            resultsSection.appendChild(resultDiv);
+          });
+        }
+      };
+      xhr.send();
+    }
+    getResults();
+  </script>
+</html>
